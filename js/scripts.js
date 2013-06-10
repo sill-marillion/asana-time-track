@@ -6,12 +6,16 @@ $(function(){
     var apiKeyEditDelete = apiKeyForm.find('#api-key-edit, #api-key-delete, #api-key-refresh');
     var apiKeyInput = apiKeyForm.find('#api-key');
     var workspaceContainer = apiKeyForm.siblings('#workspace-container');
+    var projectContainer = $('#project-container');
     var apiKeyImg = apiKeyForm.find('.ajax_img');
     var workspace = $('.container').children('#loader-wrapper');
     var workspaceLoader = workspace.find('.ajax_img');
     var workspaceRefresh = workspace.find('#workspace-refresh');
     var modalBackdrop = $('.modal-backdrop');
     var activeWorkspaceId = null;
+    var activeProjectId = null;
+    var workspaceCaption = '';
+    var projectCaption = '';
     modalInit();
 
     // ##############################################################################################
@@ -26,6 +30,14 @@ $(function(){
             apiKeyImg.fadeIn();
             workspacesAjaxCall();
         }
+    }
+    
+    function projectModalInit() {
+    	$('#project-modal').modal({
+		      keyboard: false,
+		      backdrop: false
+		    });
+    	projectContainer.fadeIn();
     }
 
     function workspacesAjaxCall(){
@@ -56,6 +68,7 @@ $(function(){
       backdrop: false
     });
     
+    
     // stop user from exiting Modal by clicking aside the Modal
     $('.modal-backdrop').on('click', function(e){
         return false;
@@ -64,7 +77,7 @@ $(function(){
     // look for the Workspaces of the user
     $('#start-send').on('click', function(){
         if($('#api-key-form')[0].checkValidity()){
-            $.cookie('asana-api-key', apiKeyInput.val(), { expires: 7 });
+            $.cookie('asana-api-key', apiKeyInput.val(), { expires: 120 });
             apiKeyInput.attr('disabled', '');
             apiKeyImg.fadeIn();
             apiKeyFormSubmit.fadeOut();
@@ -98,7 +111,7 @@ $(function(){
     });
     
     // we kinda hacked the Modal of bootstrap -> manual show
-    $('#change-workspace').on('click', function(){
+    $('#change-workspace, #change-project').on('click', function(){
         modalBackdrop.show();
     });
     
@@ -106,21 +119,73 @@ $(function(){
         modalBackdrop.hide();
     });
     
+    $('#project-modal').on('click', '#project-modal > .modal-footer .btn', function (){
+        modalBackdrop.hide();
+    });
+    
     // change workspaces on click (ajaxCall + changing Headlines etc. )
     $('#workspace-container').on('click', '#workspace-container > .workspace', function(){
-        var caption = $(this).find('h3').text();
+        workspaceCaption = $(this).find('h3').text();
         activeWorkspaceId = $(this).data('workspace-id');
+        
         $('#start-modal').modal('hide');
-        $('.workspace_caption').show().attr('data-workspace-id', activeWorkspaceId).html(caption);
-        modalBackdrop.fadeOut();
+        //modalBackdrop.fadeOut();
         $('#start-modal').children('.modal-footer').html('<a href="#" class="btn" data-dismiss="modal">Close</a>');
-        tasksAjaxCall();
-        workspaceLoader.show();
+        $('#project-modal .modal-header').html('<h3>Project selection for ' + workspaceCaption + '</h3>');
+        //$('.modal-body').html('');
+        getProjectList();
+        
+
+        //$('#start-modal').modal('hide');
+		//$('.workspace_workspaceCaption').show().attr('data-workspace-id', activeWorkspaceId).html(workspaceCaption);
+        //modalBackdrop.fadeOut();
+        //$('#start-modal').children('.modal-footer').html('<a href="#" class="btn" data-dismiss="modal">Close</a>');
+        //tasksAjaxCall();
+        //workspaceLoader.show();
+    });
+    
+    
+    $('#project-container').on('click', '#project-container > .project', function(){
+    	projectCaption = $(this).find('h3').text();
+    	activeProjectId = $(this).data('project-id');
+    	$('#project-modal').modal('hide');
+			$('.workspace_caption').show().attr('data-workspace-id', activeWorkspaceId).html(workspaceCaption);
+			$('.project_caption').show().attr('data-project-id', activeProjectId).html(projectCaption);
+      modalBackdrop.fadeOut();
+      $('#project-modal').children('.modal-footer').html('<a href="#" class="btn" data-dismiss="modal">Close</a>');
+      tasksAjaxCall();
+      workspaceLoader.show();
     });
     
     // ##############################################################################################
     // Tasks table & track time
     // ##############################################################################################
+    
+    function getProjectList() {
+    	$.ajax({
+          type: "GET",
+          url: "request.php",
+          data: "apiKey=" + apiKeyInput.val() + "&workspaceId=" + activeWorkspaceId,// + "&projectId=all",
+          timeout: 90000,
+          success: function( result ) {
+             $('#project-modal #project-container').html(result);
+             projectModalInit();
+              //console.log(result);
+              //workspaceLoader.fadeOut();
+              //workspaceRefresh.fadeIn();
+              //initTimepicker();
+              //$('.my_label').tooltip();
+            },
+          error : function( msg, time ) {
+              if(time === 'timeout'){
+                  $('#project-modal #project-container').append("Timeout, no response from Server. We're sorry...");
+              }
+              $('#track-table').append(msg.responseText);
+              workspaceLoader.fadeOut();
+              workspaceRefresh.fadeIn();
+            }
+        });
+    }
     
     function tasksAjaxCall(projectId){
         // clean tbody
@@ -129,7 +194,7 @@ $(function(){
         $.ajax({
           type: "GET",
           url: "request.php",
-          data: "apiKey=" + apiKeyInput.val() + "&workspaceId=" + activeWorkspaceId + "&projectId=all",
+          data: "apiKey=" + apiKeyInput.val() + "&workspaceId=" + activeWorkspaceId + "&projectId=" + activeProjectId,
           timeout: 90000,
           success: function( result ) {
               $('#track-table').show().find('tbody').html(result);
@@ -149,8 +214,9 @@ $(function(){
         });
     }
     
-    // updates the Taks with the new data in Asana
+    // updates the Tasks with the new data in Asana
     function changeTasksAjaxCall(getTaskId, getEstimatedHours, getEstimatedMinutes, newHours, newMinutes, getTaskName){
+    	
         $.ajax({
               type: "GET",
               url: "request.php",
@@ -158,6 +224,7 @@ $(function(){
               timeout: 30000,
               success: function( result ) {
                  // update was successful
+                 //console.log('here now');
                  workspaceRefresh.removeClass('disabled');
               },
               error : function( msg, time ) {
@@ -168,6 +235,36 @@ $(function(){
               }
         });
     }
+    
+    // updates the Tasks completion state
+    function changeTaskCompletionAjaxCall(getTaskId, completionState, el){
+
+        $.ajax({
+              type: "GET",
+              url: "request.php",
+              data: "apiKey=" + apiKeyCookie + "&updateId=" + getTaskId + "&complete=" + completionState,
+              timeout: 30000,
+              success: function( result ) {
+                 // update was successful
+                 //console.log('here now');
+                 //workspaceRefresh.removeClass('disabled');
+                 if($(el).hasClass('open')) {
+                 	$(el).removeClass('open').addClass('closed');
+                 	$(el).parents('tr').removeClass('open-task').addClass('completed-task');
+                 } else {
+                 	$(el).removeClass('closed').addClass('open');
+                 	$(el).parents('tr').removeClass('completed-task').addClass('open-task');
+                 }
+              },
+              error : function( msg, time ) {
+                 if(time === 'timeout'){
+                     $('#track-table').append("Timeout, no response from Server. We're sorry... Please try it again.");
+                 }
+                 $('#track-table').append(msg.responseText);
+              }
+        });
+    }
+    
     
     // init the nice jquery-plugin from http://mobiscroll.com/
     function initTimepicker(){
@@ -310,6 +407,14 @@ $(function(){
         locateClickedElement.prev('.time').stopwatch().stopwatch('toggle');
         
     });
+    
+    $("input.complete-checkbox").live('click', function(event){
+    	var taskId = $(this).data('task-id');
+    	var completionChangeStatus = ($(this).hasClass('open') ? 'true' : 'false');
+
+    	changeTaskCompletionAjaxCall(taskId, completionChangeStatus, this);
+    });
+    
     
     // refresh the Workspace manual
     workspaceRefresh.on('click', function(){

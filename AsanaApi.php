@@ -56,8 +56,17 @@ class AsanaApi {
         return $this->apiRequest($this->workspaceUri);
     }
     
+    public function getProjects($workspaceId){
+        //echo $workspaceId;
+        return $this->apiRequest($this->workspaceUri . '/' . $workspaceId . '/projects' );
+    }
+    
     public function getTasks($workspaceId){
         return $this->apiRequest($this->workspaceUri.'/'.$workspaceId.'/tasks?assignee=me');
+    }
+    
+    public function getProjectTasks($projectId){
+        return $this->apiRequest($this->projectUri.'/'.$projectId.'/tasks?assignee=me');
     }
     
     public function getOneTask($taskId){
@@ -82,6 +91,14 @@ class AsanaApi {
         return $this->apiRequest($this->taskUri.'/'.$taskId , $data, self::PUT_METHOD);
     }
     
+    public function updateTaskCompletionState($taskId, $completionStateUpdate) {
+        $data = array( "completed" => $completionStateUpdate);        
+        $data = array("data" => $data);
+        $data = json_encode($data);
+        
+        return $this->apiRequest($this->taskUri.'/'.$taskId , $data, self::PUT_METHOD);
+    }
+    
     public function getEstimatedAndWorkedTime($taskName){
         $estimatedTimeHours = 0;
         $estimatedTimeMinutes = 0;
@@ -92,7 +109,7 @@ class AsanaApi {
         $pattern = "/\[ET\: (\d+)h (\d+)m\] \[WT\: (\d+)h (\d+)m\]$/";
         
         if(preg_match($pattern, $taskName, $matches)) {
-            
+          
             // estimated time
             $estimatedTimeHours = $matches[1];
             $estimatedTimeMinutes = $matches[2];

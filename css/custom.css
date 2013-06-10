@@ -1,0 +1,103 @@
+tr.completed-task,
+tr.completed-task:hover {
+	background: #777;
+}
+
+tr.completed-task .my_progress .progress,
+tr.completed-task .my_timer .btn {
+	visibility: hidden;
+	display: none;
+}
+
+.well.project {
+	padding: 4px 5px;
+	margin-bottom: 10px;
+	cursor: hand;
+	cursor: pointer;
+}
+
+tr.header-row {
+	background-color: #EEE;
+}
+
+tr.open-task {
+	font-weight: bold;
+}
+
+h3 {
+	font-size: 16px;
+}
+
+.table th, .table td {
+	padding: 4px 6px;
+}
+
+.btn {
+	-webkit-border-radius: 0px;
+	-moz-border-radius: 0px;
+	border-radius: 0px;
+}
+
+tr.completed-task {
+	display: none;
+}
+
+.estimated_time, 
+.worked_time {
+	width: 80px;
+}
+
+td.form-checkbox {
+	text-align: center;
+}
+
+td.form-checkbox form {
+	margin: 0;
+}
+
+.min-header {
+	font-size: normal; 
+	font-size: 10px;
+}
+
+.minimize-button div {
+	text-align: center;
+	font-size: 14px;
+}
+
+.task-caption {
+	font-size: 12px;
+}
+
+.container .workspace_caption {
+	margin: 0;
+}
+
+.container .project_caption {
+	display: none;
+	clear: both;
+	margin: 5px 0 20px 0;
+	font-size: 18px;
+	line-height: 20px;
+	color: #444;
+}
+
+#track-table .my_timer>* {
+	margin: 0;
+}
+
+#track-table .my_timer .time {
+	margin: 0 15px 0 0;
+}
+
+.my_timer {
+	width: 145px;
+}
+
+.my_progress {
+	width:120px;
+}
+
+.completion-box {
+	width: 26px !important;
+}

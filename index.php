@@ -9,6 +9,7 @@
 
     <!-- Le styles -->
     <link href="css/styles.css" rel="stylesheet">
+    <link href="css/speaksocial_customized.css" rel="stylesheet">
     <link rel="icon" type="img/ico" href="img/favicon.ico">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -27,16 +28,23 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="#">Asana Time Track</a>
+          <a class="brand" href="#">Speak Social Time Track</a>
           <div class="nav-collapse">
             <ul class="nav">
               <li class="active"><a href="#">Home</a></li>
               <li id="change-workspace"><a data-toggle="modal" href="#start-modal">Change Workspace </a></li>
-              <li><a data-toggle="modal" href="#about-modal">About</a></li>
+              <li id="change-project"><a data-toggle="modal" href="#project-modal">Change Project </a></li>
+              <!--<li><a data-toggle="modal" href="#about-modal">About</a></li>-->
             </ul>
           </div><!--/.nav-collapse -->
           <div class="nav-collapse pull-right">
             <ul class="nav">
+              <li>
+                    <a href="#"><label class="checkbox">
+                      <input id="hide-completed" type="checkbox" value="" checked>
+                      Hide Completed
+                    </label></a>
+                </li>
                 <li>
                     <a href="#"><label class="checkbox">
                       <input id="animate" type="checkbox" value="" checked>
@@ -74,6 +82,7 @@
                   <img class="ajax_img" src="img/ajax-loader.gif"/>
              </span>
              <p class="hint_api_key">The Asana-Api-Key is only saved on your computer (Cookie).</p>
+             <p class="hint_api_key">Click <a href="http://app.asana.com/-/account_api" target="_blank">here</a> for your Asana Api Key. Then copy and paste it into the above box.</p>
             </div>
           </div>
           <button id="start-send" type="submit" class="btn">Submit</button>
@@ -84,6 +93,20 @@
       <div class="modal-footer">
       </div>
     </div>
+    
+    
+    <div class="modal fade" id="project-modal">
+      <div class="modal-header">
+      </div>
+      <div class="modal-body">
+  
+        <div id="project-container">
+        </div>
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+    
     
     <div class="modal fade" id="about-modal">
       <div class="modal-header">
@@ -115,16 +138,17 @@
         </button>
         <img class="ajax_img" src="img/ajax-loader.gif"/>
     </div>
+    <h2 class="project_caption"></h2>
     <div id="track-table">
       <table class="att_track_table table table-bordered">
         <thead>
-          <tr>
-            <th>Project</th>
+          <tr class="header-row">
             <th>Tasks (assigned to you)</th>
-            <th>Estimated Time</th>
-            <th>Worked Time</th>
-            <th>Progress</th>
-            <th>Timer</th>
+            <th class="min-header">Estimated Time</th>
+            <th class="min-header">Worked Time</th>
+            <th class="min-header">Progress</th>
+            <th class="min-header">Timer</th>
+            <th class="min-header">Completed</th>
           </tr>
         </thead>
         <tbody>
@@ -138,7 +162,7 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="js/js-libs/jquery/jquery.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script src="js/js-libs/bootstrap/bootstrap-modal.js"></script>
     <script src="js/js-libs/bootstrap/bootstrap-tooltip.js"></script>
     <script src="js/js-libs/jquery/jquery.cookie.js"></script>
@@ -146,5 +170,6 @@
     <script src="js/js-libs/mobiscroll-2.0.custom.min.js"></script>
     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
     <script src="js/scripts.js"></script>
+    <script src="js/custom.js"></script>
   </body>
 </html>
